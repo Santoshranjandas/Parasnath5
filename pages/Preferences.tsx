@@ -2,11 +2,23 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, Eye, Volume2, Moon, Globe, ChevronRight } from 'lucide-react';
 
+interface PreferencesState {
+  push: boolean;
+  email: boolean;
+  privacy: boolean;
+  dark: boolean;
+  highContrast: boolean;
+}
+
 const Preferences: React.FC = () => {
-  const [toggles, setToggles] = useState(() => {
+  const [toggles, setToggles] = useState<PreferencesState>(() => {
     const saved = localStorage.getItem('app-preferences');
     if (saved) {
-      return JSON.parse(saved);
+      try {
+        return JSON.parse(saved) as PreferencesState;
+      } catch (e) {
+        console.error("Failed to parse preferences", e);
+      }
     }
     return {
       push: true,
@@ -35,8 +47,8 @@ const Preferences: React.FC = () => {
     }
   }, [toggles]);
 
-  const handleToggle = (key: keyof typeof toggles) => {
-    setToggles(prev => ({ ...prev, [key]: !prev[key] }));
+  const handleToggle = (key: keyof PreferencesState) => {
+    setToggles((prev: PreferencesState) => ({ ...prev, [key]: !prev[key] }));
   };
 
   return (
