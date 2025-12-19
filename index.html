@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Parasnath Nagari Building No 5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              sage: {
+                50: '#F2F4F2',
+                100: '#E6E9E0',
+                600: '#6B8E6B',
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --bg-color: #F8F9F5;
+        --text-color: #3D4F3D;
+        --card-bg: rgba(255, 255, 255, 0.75);
+        --muted-text: #8C9A8C;
+        --border-color: rgba(255, 255, 255, 0.5);
+      }
+
+      .dark {
+        --bg-color: #1A1F1A;
+        --text-color: #E6E9E0;
+        --card-bg: rgba(45, 55, 45, 0.8);
+        --muted-text: #A3B18A;
+        --border-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .high-contrast {
+        --bg-color: #FFFFFF;
+        --text-color: #000000;
+        --card-bg: #FFFFFF;
+        --muted-text: #000000;
+        --border-color: #000000;
+      }
+
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        min-height: 100vh;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      .font-serif {
+        font-family: 'Playfair Display', serif;
+      }
+      .font-bebas {
+        font-family: 'Bebas Neue', sans-serif;
+        letter-spacing: 0.05em;
+      }
+      .soft-shadow {
+        box-shadow: 0 10px 30px -10px rgba(107, 142, 107, 0.15);
+      }
+      .dark .soft-shadow {
+        box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+      }
+      .high-contrast .soft-shadow {
+        box-shadow: none;
+      }
+      .glass-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--border-color);
+      }
+      
+      .high-contrast .glass-card {
+        background: #FFFFFF !important;
+        border: 2px solid #000000 !important;
+        backdrop-filter: none !important;
+      }
+
+      /* Theme overrides */
+      .dark input, .dark textarea {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        color: var(--text-color) !important;
+      }
+      
+      .high-contrast input, .high-contrast textarea {
+        background-color: #FFFFFF !important;
+        border: 2px solid #000000 !important;
+        color: #000000 !important;
+        opacity: 1 !important;
+      }
+
+      .dark .text-\[#3D4F3D\] { color: var(--text-color) !important; }
+      .dark .text-\[#8C9A8C\] { color: var(--muted-text) !important; }
+      .dark .bg-\[#F8F9F5\] { background-color: var(--bg-color) !important; }
+      .dark .bg-\[#F2F2EB\] { background-color: #242B24 !important; }
+
+      .high-contrast .text-\[#3D4F3D\], 
+      .high-contrast .text-\[#8C9A8C\],
+      .high-contrast .text-orange-500,
+      .high-contrast .text-blue-500,
+      .high-contrast .text-[#6B8E6B],
+      .high-contrast .font-serif,
+      .high-contrast p,
+      .high-contrast span,
+      .high-contrast h1,
+      .high-contrast h2,
+      .high-contrast h3,
+      .high-contrast h4,
+      .high-contrast h5 {
+        color: #000000 !important;
+      }
+
+      .high-contrast .bg-\[#F8F9F5\],
+      .high-contrast .bg-\[#F2F2EB\],
+      .high-contrast .bg-white,
+      .high-contrast .bg-white\/90,
+      .high-contrast .bg-white\/50,
+      .high-contrast main,
+      .high-contrast header,
+      .high-contrast body {
+        background-color: #FFFFFF !important;
+      }
+
+      .high-contrast .bg-\[#6B8E6B\],
+      .high-contrast button.bg-\[#6B8E6B\] {
+        background-color: #000000 !important;
+        color: #FFFFFF !important;
+        border: 2px solid #000000 !important;
+      }
+
+      .high-contrast .border,
+      .high-contrast .border-white,
+      .high-contrast .border-gray-100 {
+        border-color: #000000 !important;
+        border-width: 2px !important;
+      }
+
+      /* Responsive FAB positioning */
+      .fab-position {
+        right: 1.5rem;
+      }
+      @media (min-width: 500px) {
+        .fab-position {
+          right: calc(50% - 225px);
+        }
+      }
+
+      /* Transitions and animations */
+      .page-transition {
+        animation: slideIn 0.4s ease-out forwards;
+      }
+
+      @keyframes slideIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      ::-webkit-scrollbar {
+        display: none;
+      }
+      * {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.1.0",
+    "lucide-react": "https://esm.sh/lucide-react@0.454.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.0.0/",
+    "react/": "https://esm.sh/react@^19.0.0/",
+    "react": "https://esm.sh/react@^19.0.0"
+  }
+}
+</script>
+</head>
+  <body class="overflow-x-hidden antialiased">
+    <div id="root"></div>
+  </body>
+</html>

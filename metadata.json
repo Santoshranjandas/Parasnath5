@@ -1,0 +1,7 @@
+{
+  "name": "Parasnath Nagari Building No 5",
+  "description": "A premium, nature-inspired society management web application for residents and administrators, featuring payment tracking, notice boards, AGM management, and maintenance requests.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
