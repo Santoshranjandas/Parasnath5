@@ -6,7 +6,9 @@ import { User, Expense, Issue, Vendor, Notice, PaymentRecord, Task, AGMSession }
  * Integrated with FastAPI Backend.
  */
 
-const isProduction = window.location.hostname !== 'localhost';
+// If we are in the Aistudio environment, BASE_URL should be empty so rewrites in vercel.json work
+// If we are local, we might need localhost:8000
+const isProduction = window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1');
 const BASE_URL = isProduction ? '' : 'http://localhost:8000'; 
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -20,8 +22,14 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`${BASE_URL}${path}`, { ...options, headers });
   
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'Network error' }));
-    throw new Error(error.detail || 'API request failed');
+    let errorDetail = 'API request failed';
+    try {
+      const error = await response.json();
+      errorDetail = error.detail || errorDetail;
+    } catch (e) {
+      // Not JSON
+    }
+    throw new Error(errorDetail);
   }
   
   return response.json();
@@ -59,20 +67,19 @@ export const api = {
   notices: {
     list: async (): Promise<Notice[]> => {
       const notices = await request<any[]>('/api/notices');
-      // Map database snake_case to frontend camelCase
+      // Map database snake_case or standard fields to frontend camelCase
       return notices.map(n => ({
         id: String(n.id),
         title: n.title,
         content: n.content,
         type: n.type || 'Announcement',
-        postedAt: new Date(n.posted_at).toLocaleDateString(),
-        postedBy: n.posted_by,
+        postedAt: n.posted_at ? new Date(n.posted_at).toLocaleDateString() : 'Just now',
+        postedBy: n.posted_by || 'Admin',
         tags: ['Society'],
         isRead: false
       }));
     },
     markRead: async (id: string): Promise<void> => {
-      // Logic for marking as read can be implemented in DB later
       console.log('Marking read:', id);
     }
   },
@@ -91,7 +98,6 @@ export const api = {
 
   payments: {
     list: async (): Promise<PaymentRecord[]> => {
-      // Static mock for now until Payment table is fully integrated
       return [
         { id: 'pay1', amount: 2500, date: 'June 2025', method: 'UPI', status: 'Pending', type: 'Maintenance' },
         { id: 'pay2', amount: 2500, date: 'May 2025', method: 'UPI', status: 'Paid', type: 'Maintenance' }
