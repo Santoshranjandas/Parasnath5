@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Save, Upload, CheckCircle2, DollarSign, FileText, User as UserIcon, ChevronDown, AlertCircle } from 'lucide-react';
@@ -93,6 +92,18 @@ const ExpenseNew: React.FC<ExpenseNewProps> = ({ setExpenses, user }) => {
       setLoading(false);
     }
   };
+
+  const categories: Expense['category'][] = [
+    'Maintenance', 
+    'Repairs', 
+    'Salaries', 
+    'Utilities', 
+    'Groceries', 
+    'Admin Costs', 
+    'Security', 
+    'Events', 
+    'Other'
+  ];
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
@@ -189,7 +200,7 @@ const ExpenseNew: React.FC<ExpenseNewProps> = ({ setExpenses, user }) => {
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-[#8C9A8C] uppercase tracking-wider px-1">Category</label>
             <div className="flex flex-wrap gap-2">
-              {(['Utility', 'Salary', 'Maintenance', 'Security', 'Event', 'Other'] as const).map(cat => (
+              {categories.map(cat => (
                 <button
                   key={cat}
                   type="button"

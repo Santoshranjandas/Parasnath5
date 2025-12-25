@@ -4,7 +4,8 @@ export type UserRole = 'admin' | 'member';
 export interface User {
   id: string;
   fullName: string;
-  email: string;
+  email?: string;
+  phone: string;
   role: UserRole;
   flatId: string;
 }
@@ -90,7 +91,7 @@ export interface AGMSession {
 export interface Expense {
   id: string;
   title: string;
-  category: 'Utility' | 'Salary' | 'Maintenance' | 'Security' | 'Event' | 'Other';
+  category: 'Utilities' | 'Salaries' | 'Maintenance' | 'Security' | 'Events' | 'Repairs' | 'Groceries' | 'Admin Costs' | 'Other';
   amount: number;
   date: string;
   proofUrl: string;

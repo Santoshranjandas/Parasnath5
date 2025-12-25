@@ -1,7 +1,6 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CreditCard, MessageSquare, ListTodo, Bell, RefreshCw } from 'lucide-react';
+import { CreditCard, MessageSquare, ListTodo, Bell, RefreshCw, X, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { User, Notice } from '../types';
 import { api } from '../lib/api';
 
@@ -10,17 +9,23 @@ interface DashboardProps {
   notices: Notice[];
   setNotices: React.Dispatch<React.SetStateAction<Notice[]>>;
   refreshData: () => Promise<void>;
+  isNewUser?: boolean;
+  onWelcomeSeen?: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ user, notices, setNotices, refreshData }) => {
+const Dashboard: React.FC<DashboardProps> = ({ user, notices, setNotices, refreshData, isNewUser, onWelcomeSeen }) => {
   const navigate = useNavigate();
   const [refreshing, setRefreshing] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    if (isNewUser) setShowWelcome(true);
+  }, [isNewUser]);
 
   const unreadCount = notices.filter(n => !n.isRead).length;
 
   const handleMarkAllAsRead = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    // In a real app, this would be a bulk API call
     const promises = notices.filter(n => !n.isRead).map(n => api.notices.markRead(n.id));
     await Promise.all(promises);
     setNotices(notices.map(n => ({ ...n, isRead: true, isNew: false })));
@@ -36,6 +41,11 @@ const Dashboard: React.FC<DashboardProps> = ({ user, notices, setNotices, refres
     setRefreshing(true);
     await refreshData();
     setRefreshing(false);
+  };
+
+  const closeWelcome = () => {
+    setShowWelcome(false);
+    if (onWelcomeSeen) onWelcomeSeen();
   };
 
   return (
@@ -160,6 +170,61 @@ const Dashboard: React.FC<DashboardProps> = ({ user, notices, setNotices, refres
           ))}
         </div>
       </div>
+
+      {/* New User Welcome Modal */}
+      {showWelcome && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="w-full max-w-sm bg-white dark:bg-[#242B24] rounded-[32px] p-8 shadow-2xl relative animate-in zoom-in-95 duration-500 border border-white/20">
+            <button 
+              onClick={closeWelcome}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-gray-400 transition-colors"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="flex justify-center mb-6">
+              <div className="w-20 h-20 bg-[#6B8E6B]/10 rounded-full flex items-center justify-center relative">
+                 <CheckCircle2 size={40} className="text-[#6B8E6B]" />
+                 <div className="absolute top-0 right-0 w-4 h-4 bg-orange-400 rounded-full border-2 border-white animate-bounce"></div>
+              </div>
+            </div>
+
+            <h3 className="text-2xl font-serif font-bold text-[#3D4F3D] dark:text-[#E6E9E0] text-center mb-2">Welcome Aboard!</h3>
+            <p className="text-center text-sm text-[#8C9A8C] dark:text-[#A3B18A] mb-8 leading-relaxed">
+              You are now a verified member of <strong>Parasnath Nagari</strong>. Your account has been successfully created.
+            </p>
+
+            <div className="space-y-4">
+               <div className="flex items-center gap-4 bg-gray-50 dark:bg-white/5 p-3 rounded-2xl">
+                 <div className="w-10 h-10 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center shrink-0">
+                    <Bell size={20} />
+                 </div>
+                 <div>
+                    <h4 className="font-bold text-xs text-[#3D4F3D] dark:text-[#E6E9E0]">Stay Updated</h4>
+                    <p className="text-[10px] text-[#8C9A8C]">Check notices and announcements.</p>
+                 </div>
+               </div>
+               
+               <div className="flex items-center gap-4 bg-gray-50 dark:bg-white/5 p-3 rounded-2xl">
+                 <div className="w-10 h-10 bg-orange-50 text-orange-500 rounded-xl flex items-center justify-center shrink-0">
+                    <MessageSquare size={20} />
+                 </div>
+                 <div>
+                    <h4 className="font-bold text-xs text-[#3D4F3D] dark:text-[#E6E9E0]">Raise Issues</h4>
+                    <p className="text-[10px] text-[#8C9A8C]">Report maintenance problems easily.</p>
+                 </div>
+               </div>
+            </div>
+
+            <button 
+              onClick={closeWelcome}
+              className="w-full bg-[#6B8E6B] text-white font-bold py-4 rounded-[24px] shadow-lg shadow-[#6B8E6B]/20 flex items-center justify-center gap-2 hover:bg-[#5a7a5a] active:scale-[0.98] transition-all mt-8"
+            >
+              Get Started <ArrowRight size={18} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

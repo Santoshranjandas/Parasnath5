@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
@@ -19,6 +18,7 @@ import Preferences from './pages/Preferences';
 import Expenses from './pages/Expenses';
 import ExpenseNew from './pages/ExpenseNew';
 import ExpenseDetail from './pages/ExpenseDetail';
+import Feedback from './pages/Feedback';
 import Layout from './components/Layout';
 import { User, Notice, Issue, Vendor, Expense, PaymentRecord, Task, AGMSession } from './types';
 import { api } from './lib/api';
@@ -45,6 +45,7 @@ const INITIAL_AGM: AGMSession[] = [
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isNewUser, setIsNewUser] = useState(false);
   
   const [notices, setNotices] = useState<Notice[]>([]);
   const [issues, setIssues] = useState<Issue[]>([]);
@@ -88,8 +89,13 @@ const App: React.FC = () => {
     setLoading(false);
   }, [refreshData]);
 
-  const handleLogin = (u: User) => { setUser(u); refreshData(); };
-  const handleLogout = () => { api.auth.logout(); setUser(null); };
+  const handleLogin = (u: User, isNew: boolean = false) => { 
+    setUser(u); 
+    setIsNewUser(isNew);
+    refreshData(); 
+  };
+  
+  const handleLogout = () => { api.auth.logout(); setUser(null); setIsNewUser(false); };
 
   if (loading) return <div className="h-screen flex items-center justify-center font-serif text-[#6B8E6B]">Loading Parasnath Nagari...</div>;
 
@@ -98,7 +104,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/login" element={!user ? <Login onLogin={handleLogin} /> : <Navigate to="/" />} />
         <Route element={user ? <Layout user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}>
-          <Route path="/" element={<Dashboard user={user!} notices={notices} setNotices={setNotices} refreshData={refreshData} />} />
+          <Route path="/" element={<Dashboard user={user!} notices={notices} setNotices={setNotices} refreshData={refreshData} isNewUser={isNewUser} onWelcomeSeen={() => setIsNewUser(false)} />} />
           <Route path="/notices" element={<Notices notices={notices} setNotices={setNotices} />} />
           <Route path="/notices/:id" element={<NoticeDetail notices={notices} setNotices={setNotices} />} />
           <Route path="/payments" element={<Payments />} />
@@ -115,6 +121,7 @@ const App: React.FC = () => {
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/settings" element={<Settings user={user!} />} />
           <Route path="/preferences" element={<Preferences />} />
+          <Route path="/feedback" element={<Feedback />} />
         </Route>
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

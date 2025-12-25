@@ -1,7 +1,6 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
-import { ChevronLeft, Grid, Settings, Heart, LogOut } from 'lucide-react';
+import { ChevronLeft, Grid, Settings, Heart, LogOut, Share2, Check } from 'lucide-react';
 import { User } from '../types';
 import FloatingMenu from './FloatingMenu';
 import { FloralPattern, BottomFloral } from '../constants';
@@ -13,6 +12,7 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -51,6 +51,7 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
       case '/expenses': return 'Expenses';
       case '/settings': return 'Settings';
       case '/preferences': return 'Preferences';
+      case '/feedback': return 'Feedback';
       default: return '';
     }
   };
@@ -68,6 +69,35 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
       navigate('/expenses');
     } else {
       navigate('/');
+    }
+  };
+
+  const handleShare = async () => {
+    const url = window.location.origin;
+    const shareData = {
+      title: 'Parasnath Nagari',
+      text: 'Join our society portal!',
+      url: url
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        setIsProfileOpen(false);
+      } catch (err) {
+        console.log('Share canceled');
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        setLinkCopied(true);
+        setTimeout(() => {
+          setLinkCopied(false);
+          setIsProfileOpen(false);
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy');
+      }
     }
   };
 
@@ -114,7 +144,15 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
           </button>
 
           {isProfileOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-[#2D372D] rounded-2xl shadow-2xl border border-gray-100 dark:border-white/10 py-2 z-50 animate-in fade-in zoom-in-95 duration-200">
+            <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-[#2D372D] rounded-2xl shadow-2xl border border-gray-100 dark:border-white/10 py-2 z-50 animate-in fade-in zoom-in-95 duration-200">
+               <button 
+                onClick={handleShare}
+                className="flex items-center gap-3 px-5 py-3 text-sm font-bold text-[#6B8E6B] hover:bg-[#6B8E6B]/10 w-full text-left transition-colors"
+              >
+                {linkCopied ? <Check size={18} /> : <Share2 size={18} />}
+                {linkCopied ? 'Link Copied!' : 'Share App'}
+              </button>
+              <div className="h-px bg-gray-100 dark:bg-white/10 my-1 mx-3" />
               <Link to="/settings" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-3 px-5 py-3 text-sm font-semibold text-[#3D4F3D] dark:text-[#E6E9E0] hover:bg-[#6B8E6B]/10 transition-colors">
                 <Settings size={18} className="text-[#8C9A8C]" /> Settings
               </Link>

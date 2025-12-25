@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, TrendingUp, Calendar, FileText, ChevronRight, X, ArrowLeft, ZoomIn } from 'lucide-react';
@@ -12,6 +11,7 @@ interface ExpensesProps {
 const Expenses: React.FC<ExpensesProps> = ({ expenses, user }) => {
   const navigate = useNavigate();
   const [selectedMonthFilter, setSelectedMonthFilter] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
   // Helper to get month name
   const getMonthName = (monthIdx: number) => {
@@ -56,10 +56,14 @@ const Expenses: React.FC<ExpensesProps> = ({ expenses, user }) => {
     .filter(e => new Date(e.date).getFullYear() === new Date().getFullYear())
     .reduce((sum, e) => sum + e.amount, 0);
 
-  // Filtered entries based on selection
-  const filteredExpenses = selectedMonthFilter 
-    ? expenses.filter(e => e.date.startsWith(selectedMonthFilter))
-    : expenses;
+  // Filtered entries based on selection (Month + Category)
+  const filteredExpenses = expenses.filter(e => {
+    const matchesMonth = selectedMonthFilter ? e.date.startsWith(selectedMonthFilter) : true;
+    const matchesCategory = selectedCategory === 'All' || e.category === selectedCategory;
+    return matchesMonth && matchesCategory;
+  });
+
+  const categories = ['All', 'Maintenance', 'Repairs', 'Salaries', 'Utilities', 'Groceries', 'Admin Costs', 'Security', 'Events', 'Other'];
 
   const handleBarClick = (key: string) => {
     setSelectedMonthFilter(key);
@@ -70,9 +74,29 @@ const Expenses: React.FC<ExpensesProps> = ({ expenses, user }) => {
   };
 
   const getFilterLabel = () => {
-    if (!selectedMonthFilter) return "All Time Register";
+    const prefix = selectedCategory !== 'All' ? `${selectedCategory} ` : '';
+    if (!selectedMonthFilter) return `${prefix}Register (All Time)`;
     const [year, month] = selectedMonthFilter.split('-');
-    return `Register for ${getMonthName(parseInt(month) - 1)} ${year}`;
+    return `${prefix}Register for ${getMonthName(parseInt(month) - 1)} ${year}`;
+  };
+
+  const getCategoryStyles = (category: string) => {
+    switch(category) {
+      case 'Maintenance':
+      case 'Repairs':
+        return 'bg-orange-50 text-orange-500';
+      case 'Salaries':
+      case 'Admin Costs':
+      case 'Security':
+        return 'bg-blue-50 text-blue-500';
+      case 'Utilities':
+      case 'Groceries':
+        return 'bg-purple-50 text-purple-500';
+      case 'Events':
+        return 'bg-pink-50 text-pink-500';
+      default:
+        return 'bg-gray-100 text-gray-500';
+    }
   };
 
   return (
@@ -129,7 +153,7 @@ const Expenses: React.FC<ExpensesProps> = ({ expenses, user }) => {
             Expense Trends (Click bars to view)
           </h4>
           {selectedMonthFilter && (
-            <button onClick={resetFilter} className="text-[10px] font-bold text-[#6B8E6B] underline">Show All</button>
+            <button onClick={resetFilter} className="text-[10px] font-bold text-[#6B8E6B] underline">Show All Months</button>
           )}
         </div>
         <div className="flex items-end justify-between h-40 gap-2 px-2">
@@ -162,6 +186,23 @@ const Expenses: React.FC<ExpensesProps> = ({ expenses, user }) => {
         </div>
       </div>
 
+      {/* Category Filter */}
+      <div className="flex gap-2 overflow-x-auto pb-2 px-1 -mx-1 no-scrollbar">
+         {categories.map(cat => (
+           <button
+             key={cat}
+             onClick={() => setSelectedCategory(cat)}
+             className={`whitespace-nowrap px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all border ${
+               selectedCategory === cat
+                 ? 'bg-[#3D4F3D] text-white border-[#3D4F3D] shadow-md'
+                 : 'bg-white/60 dark:bg-white/5 border-white/50 dark:border-white/10 text-[#8C9A8C] hover:bg-white dark:hover:bg-white/10'
+             }`}
+           >
+             {cat}
+           </button>
+         ))}
+      </div>
+
       {/* Recent List */}
       <div className="space-y-4">
         <div className="flex items-center justify-between px-2">
@@ -174,7 +215,7 @@ const Expenses: React.FC<ExpensesProps> = ({ expenses, user }) => {
                 onClick={resetFilter}
                 className="text-[10px] text-[#6B8E6B] font-bold flex items-center gap-1 mt-1"
               >
-                <ArrowLeft size={10} /> Clear selection
+                <ArrowLeft size={10} /> Clear month selection
               </button>
             )}
           </div>
@@ -199,11 +240,7 @@ const Expenses: React.FC<ExpensesProps> = ({ expenses, user }) => {
                 className="w-full text-left glass-card rounded-[24px] p-4 border border-white/70 flex items-center justify-between group hover:bg-white/40 transition-all active:scale-[0.98]"
               >
                 <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-bold ${
-                    expense.category === 'Maintenance' ? 'bg-orange-50 text-orange-500' :
-                    expense.category === 'Salary' ? 'bg-blue-50 text-blue-500' :
-                    expense.category === 'Utility' ? 'bg-purple-50 text-purple-500' : 'bg-gray-100 text-gray-500'
-                  }`}>
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-bold ${getCategoryStyles(expense.category)}`}>
                     {expense.category[0]}
                   </div>
                   <div>

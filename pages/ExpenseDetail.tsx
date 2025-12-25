@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, FileText, CheckCircle2, DollarSign, ZoomIn } from 'lucide-react';
@@ -27,15 +26,30 @@ const ExpenseDetail: React.FC<ExpenseDetailProps> = ({ expenses }) => {
     );
   }
 
+  const getCategoryStyles = (category: string) => {
+    switch(category) {
+      case 'Maintenance':
+      case 'Repairs':
+        return 'bg-orange-50 text-orange-500';
+      case 'Salaries':
+      case 'Admin Costs':
+      case 'Security':
+        return 'bg-blue-50 text-blue-500';
+      case 'Utilities':
+      case 'Groceries':
+        return 'bg-purple-50 text-purple-500';
+      case 'Events':
+        return 'bg-pink-50 text-pink-500';
+      default:
+        return 'bg-gray-100 text-gray-500';
+    }
+  };
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-3">
-          <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider ${
-            expense.category === 'Maintenance' ? 'bg-orange-50 text-orange-500' :
-            expense.category === 'Salary' ? 'bg-blue-50 text-blue-500' :
-            expense.category === 'Utility' ? 'bg-purple-50 text-purple-500' : 'bg-gray-100 text-gray-500'
-          }`}>
+          <span className={`text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider ${getCategoryStyles(expense.category)}`}>
             {expense.category}
           </span>
           <span className="text-[10px] text-[#8C9A8C] font-bold uppercase tracking-widest">Entry #{expense.id}</span>
