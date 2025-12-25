@@ -42,6 +42,7 @@ const Layout: React.FC<LayoutProps> = ({ user, onLogout }) => {
     }
     
     switch (location.pathname) {
+      case '/admin': return 'Admin Console';
       case '/notices': return 'Notices';
       case '/payments': return 'Payments';
       case '/agm': return 'AGM';

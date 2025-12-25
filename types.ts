@@ -8,6 +8,7 @@ export interface User {
   phone: string;
   role: UserRole;
   flatId: string;
+  isVerified?: boolean; // New field for admin approval
 }
 
 export interface Notice {
@@ -96,4 +97,12 @@ export interface Expense {
   date: string;
   proofUrl: string;
   recordedBy: string;
+}
+
+export interface SystemLog {
+  id: string;
+  action: string;
+  user: string;
+  time: string;
+  type: 'info' | 'alert' | 'success';
 }

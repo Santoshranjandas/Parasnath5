@@ -120,15 +120,14 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   }, []);
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Only allow numeric input to ensure consistency
-    const val = e.target.value.replace(/\D/g, '');
-    setPhone(val);
+    // Allow text input for "admin" username, but generally keep it for phones
+    setPhone(e.target.value);
   };
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (phone.length < 10) {
-      setError("Please enter a valid mobile number.");
+    if (phone.length < 3) {
+      setError("Please enter a valid mobile number or ID.");
       return;
     }
     
@@ -143,6 +142,13 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       } else {
         setExistingUserName(null);
         // Direct transition to OTP Verify for new users
+        // Only if it looks like a phone number
+        if (!/^\d+$/.test(phone)) {
+             setError("User ID not found.");
+             setLoading(false);
+             return;
+        }
+
         const fakeOtp = '1234'; 
         setGeneratedOtp(fakeOtp);
         setStep('OTP_VERIFY');
@@ -249,18 +255,18 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
            </div>
         ) : (
           <>
-            {/* STEP 1: PHONE ENTRY (Guest) */}
+            {/* STEP 1: PHONE/USER ENTRY */}
             {step === 'PHONE_ENTRY' && (
               <div className="w-full animate-in slide-in-from-right-8 duration-300">
-                <h3 className="text-xl font-serif text-[#3D4F3D] dark:text-[#E6E9E0] mb-1">Welcome Guest</h3>
-                <p className="text-[#8C9A8C] text-xs mb-6">Enter your mobile number to continue</p>
+                <h3 className="text-xl font-serif text-[#3D4F3D] dark:text-[#E6E9E0] mb-1">Welcome</h3>
+                <p className="text-[#8C9A8C] text-xs mb-6">Enter mobile number or username</p>
                 
                 <form onSubmit={handlePhoneSubmit} className="space-y-4">
                   <div className="relative">
                     <Smartphone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8C9A8C]" />
                     <input
-                      type="tel"
-                      placeholder="Mobile Number"
+                      type="text"
+                      placeholder="Mobile / Admin ID"
                       value={phone}
                       onChange={handlePhoneChange}
                       className="w-full bg-white/50 border border-gray-100 rounded-[20px] py-3.5 pl-12 pr-4 text-[#3D4F3D] focus:ring-2 focus:ring-[#6B8E6B]/20 focus:outline-none text-lg tracking-wide font-medium"
@@ -272,7 +278,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                     disabled={loading}
                     className="w-full bg-[#6B8E6B] text-white font-bold py-3.5 rounded-[20px] shadow-lg shadow-[#6B8E6B]/30 hover:bg-[#5a7a5a] active:scale-[0.98] transition-all disabled:opacity-50"
                   >
-                    {loading ? 'Processing...' : 'Get OTP'}
+                    {loading ? 'Processing...' : 'Request OTP'}
                   </button>
                 </form>
               </div>

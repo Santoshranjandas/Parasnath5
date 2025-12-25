@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import Notices from './pages/Notices';
 import NoticeDetail from './pages/NoticeDetail';
 import Payments from './pages/Payments';
@@ -105,6 +106,7 @@ const App: React.FC = () => {
         <Route path="/login" element={!user ? <Login onLogin={handleLogin} /> : <Navigate to="/" />} />
         <Route element={user ? <Layout user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}>
           <Route path="/" element={<Dashboard user={user!} notices={notices} setNotices={setNotices} refreshData={refreshData} isNewUser={isNewUser} onWelcomeSeen={() => setIsNewUser(false)} />} />
+          <Route path="/admin" element={user?.role === 'admin' ? <AdminDashboard /> : <Navigate to="/" />} />
           <Route path="/notices" element={<Notices notices={notices} setNotices={setNotices} />} />
           <Route path="/notices/:id" element={<NoticeDetail notices={notices} setNotices={setNotices} />} />
           <Route path="/payments" element={<Payments />} />

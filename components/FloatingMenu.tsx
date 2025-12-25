@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Bell, MessageSquare, ListTodo, Users, Landmark, CreditCard, LogOut, X, BarChart3, MessageCirclePlus } from 'lucide-react';
+import { Home, Bell, MessageSquare, ListTodo, Users, Landmark, CreditCard, LogOut, X, BarChart3, MessageCirclePlus, ShieldCheck } from 'lucide-react';
+import { User } from '../types';
 
 interface FloatingMenuProps {
   isOpen: boolean;
@@ -9,10 +10,18 @@ interface FloatingMenuProps {
 }
 
 const FloatingMenu: React.FC<FloatingMenuProps> = ({ isOpen, onClose, onLogout }) => {
+  // We need to check if user is admin. Since props don't pass user, we can get it from storage 
+  // or rely on context. For simplicity in this structure, we read from localStorage
+  // A better approach would be passing user as prop, but this matches current architecture.
+  const userStr = localStorage.getItem('user');
+  const user: User | null = userStr ? JSON.parse(userStr) : null;
+  const isAdmin = user?.role === 'admin';
+
   if (!isOpen) return null;
 
   const menuItems = [
     { icon: Home, label: 'Dashboard', path: '/' },
+    ...(isAdmin ? [{ icon: ShieldCheck, label: 'Admin Console', path: '/admin' }] : []),
     { icon: Bell, label: 'Notices', path: '/notices' },
     { icon: MessageSquare, label: 'Issues', path: '/issues' },
     { icon: ListTodo, label: 'Tasks', path: '/tasks' },

@@ -1,4 +1,4 @@
-import { User, Expense, Issue, Vendor, Notice, PaymentRecord, Task, AGMSession } from '../types';
+import { User, Expense, Issue, Vendor, Notice, PaymentRecord, Task, AGMSession, SystemLog } from '../types';
 
 // --- MOCK API IMPLEMENTATION ---
 const MOCK_DELAY = 600;
@@ -26,7 +26,7 @@ const saveUserToDb = (user: User, mpin: string) => {
 const MOCK_ADMIN: User = {
   id: 'admin',
   fullName: 'Society Admin',
-  phone: '9876543210',
+  phone: 'admin', // Acts as username
   role: 'admin',
   flatId: 'Office'
 };
@@ -66,8 +66,10 @@ export const api = {
   auth: {
     checkUser: async (phone: string): Promise<{ exists: boolean, full_name?: string }> => {
       await wait();
-      // Check Admin
-      if (phone === '9876543210') return { exists: true, full_name: 'Society Admin' };
+      // Check Admin (Allow 'admin' or the old number)
+      if (phone.toLowerCase() === 'admin' || phone === '9876543210') {
+        return { exists: true, full_name: 'Society Admin' };
+      }
 
       // Check DB
       const users = getStoredUsers();
@@ -82,7 +84,7 @@ export const api = {
       await wait();
       
       // Admin Login
-      if (phone === '9876543210' && mpin === '1234') {
+      if ((phone.toLowerCase() === 'admin' || phone === '9876543210') && mpin === '1234') {
         localStorage.setItem('saved_phone', phone);
         localStorage.setItem('access_token', 'mock-admin-token');
         localStorage.setItem('user', JSON.stringify(MOCK_ADMIN));
@@ -126,6 +128,34 @@ export const api = {
       localStorage.removeItem('access_token');
       localStorage.removeItem('user');
       // We do NOT remove 'saved_phone' to remember the user for next time
+    }
+  },
+
+  admin: {
+    getStats: async () => {
+      await wait();
+      return {
+        residents: 72,
+        pending_issues: 4,
+        monthly_collection: 180000,
+        pending_approvals: 2
+      };
+    },
+    getLogs: async (): Promise<SystemLog[]> => {
+      await wait();
+      return [
+        { id: '1', action: 'Maintenance Payment', user: 'Flat 501', time: '10 min ago', type: 'success' },
+        { id: '2', action: 'New Complaint: Water Leak', user: 'Flat 302', time: '1 hour ago', type: 'alert' },
+        { id: '3', action: 'Visitor Entry', user: 'Security Gate', time: '2 hours ago', type: 'info' },
+        { id: '4', action: 'Expense Recorded', user: 'Secretary', time: '5 hours ago', type: 'info' },
+      ];
+    },
+    getPendingUsers: async (): Promise<User[]> => {
+      await wait();
+      return [
+        { id: 'temp1', fullName: 'Rahul Verma', phone: '9898989898', role: 'member', flatId: 'B-202', isVerified: false },
+        { id: 'temp2', fullName: 'Sneha Gupta', phone: '9797979797', role: 'member', flatId: 'A-405', isVerified: false },
+      ];
     }
   },
 
